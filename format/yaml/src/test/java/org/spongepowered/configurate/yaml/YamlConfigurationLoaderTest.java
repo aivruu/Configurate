@@ -27,6 +27,8 @@ import org.spongepowered.configurate.CommentedConfigurationNode;
 import org.spongepowered.configurate.ConfigurateException;
 import org.spongepowered.configurate.ConfigurationNode;
 import org.spongepowered.configurate.loader.ConfigurationLoader;
+import org.spongepowered.configurate.objectmapping.ConfigSerializable;
+import org.spongepowered.configurate.objectmapping.meta.Comment;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -235,6 +237,25 @@ class YamlConfigurationLoaderTest {
         assertEquals("cat", node.node("mapping", Collections.singletonMap("name", "Meow")).getString());
     }
 
+    @Test
+    void testCommentsWithObjectMapper() throws ConfigurateException {
+        final Path destination = Paths.get("object-mapped-comments-test.yml");
+        final YamlConfigurationLoader loader = YamlConfigurationLoader.builder()
+                .nodeStyle(NodeStyle.BLOCK)
+                .commentsEnabled(true)
+                .defaultOptions(opts -> opts
+                        .header("Hello!\nThis is an example header.\nTesting comments-feature for YAML!")
+                        .shouldCopyDefaults(true))
+                .path(destination)
+                .build();
+
+        final CommentedConfigurationNode sourceNode = loader.load();
+        final ExampleCommentedConfig config = sourceNode.get(ExampleCommentedConfig.class);
+        sourceNode.set(ExampleCommentedConfig.class, config);
+        loader.save(sourceNode);
+
+    }
+
     private URL resource(final String path) {
         final @Nullable URL res = this.getClass().getResource(path);
         if (res == null) {
@@ -256,4 +277,18 @@ class YamlConfigurationLoaderTest {
         }
     }
 
+    @ConfigSerializable
+    private static class ExampleCommentedConfig {
+        @Comment("Enables a more-verbose logging." +
+                "\nThis shouldn't be used if it's not required or requested." +
+                "\nThe debug-mode makes the plugin to provide more detailed logs during its operation, providing\n" +
+                "specific details about the process, the output, and more-detailed errors.")
+        public boolean allowDebug = true;
+
+        @Comment(value = "A basic message testing-purposes.", afterLineBreak = true)
+        public String message = "Hello! This is a test message.";
+
+        @Comment(value = "A value that represents the max-reachable-level.")
+        public byte maxLevel = 120;
+    }
 }
