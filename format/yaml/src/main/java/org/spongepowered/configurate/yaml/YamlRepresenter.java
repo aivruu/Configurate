@@ -63,22 +63,13 @@ final class YamlRepresenter extends Representer {
             final Node yamlNode;
             if (node.isMap()) {
                 final List<NodeTuple> children = new ArrayList<>();
-                boolean first = true;
+                Node value, key;
                 for (Map.Entry<Object, ? extends ConfigurationNode> ent : node.childrenMap().entrySet()) {
                     // SnakeYAML supports both key and value comments. Add the comments on the key
-                    final Node value = represent(ent.getValue());
-                    final Node key = represent(ent.getKey());
+                    value = represent(ent.getValue());
+                    key = represent(ent.getKey());
                     key.setBlockComments(value.getBlockComments());
                     value.setBlockComments(Collections.emptyList());
-                    if (
-                            !first
-                            && !(node.parent() != null && node.parent().isList())
-                            && key.getBlockComments() != null
-                            && !key.getBlockComments().isEmpty()
-                    ) {
-                        key.getBlockComments().add(0, BLANK_LINE);
-                    }
-                    first = false;
 
                     children.add(new NodeTuple(key, value));
                 }
@@ -91,17 +82,24 @@ final class YamlRepresenter extends Representer {
                 yamlNode = new SequenceNode(Tag.SEQ, children, this.flowStyle(node));
             } else {
                 final Node optionNode = represent(node.rawScalar());
+                // Author: Fritx22 - http://github.com/devblook/Configurate/commit/9a0f9e199374bfd93a2534282a583d424c78475d
                 final org.spongepowered.configurate.yaml.@Nullable ScalarStyle requestedStyle
-                    = node.ownHint(YamlConfigurationLoader.SCALAR_STYLE);
+                    // = node.ownHint(YamlConfigurationLoader.SCALAR_STYLE);
+                    = node.hint(YamlConfigurationLoader.SCALAR_STYLE);
                 if (optionNode instanceof ScalarNode && requestedStyle != null) {
                     final ScalarNode scalar = (ScalarNode) optionNode;
-                    yamlNode = new ScalarNode(
-                        scalar.getTag(),
-                        scalar.getValue(),
-                        scalar.getStartMark(),
-                        scalar.getEndMark(),
-                        org.spongepowered.configurate.yaml.ScalarStyle.asSnakeYaml(requestedStyle, scalar.getScalarStyle())
-                    );
+                    // Author: Fritx22 - http://github.com/devblook/Configurate/commit/9a0f9e199374bfd93a2534282a583d424c78475d
+                    if (scalar.getTag() != Tag.STR && (requestedStyle == org.spongepowered.configurate.yaml.ScalarStyle.DOUBLE_QUOTED || requestedStyle == org.spongepowered.configurate.yaml.ScalarStyle.SINGLE_QUOTED)) {
+                        yamlNode = optionNode;
+                    } else {
+                        yamlNode = new ScalarNode(
+                                scalar.getTag(),
+                                scalar.getValue(),
+                                scalar.getStartMark(),
+                                scalar.getEndMark(),
+                                org.spongepowered.configurate.yaml.ScalarStyle.asSnakeYaml(requestedStyle, scalar.getScalarStyle())
+                        );
+                    }
                 } else {
                     yamlNode = optionNode;
                 }
