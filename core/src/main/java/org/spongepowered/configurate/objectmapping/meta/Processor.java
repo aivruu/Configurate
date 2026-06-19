@@ -31,6 +31,7 @@ import java.util.ResourceBundle;
  */
 @FunctionalInterface
 public interface Processor<V> {
+    String LINE_SEPARATOR = System.lineSeparator();
 
     /**
      * Transform the output node on write.
@@ -103,13 +104,18 @@ public interface Processor<V> {
         return (data, fieldType) -> (value, destination) -> {
             if (destination instanceof CommentedConfigurationNodeIntermediary<?>) {
                 final CommentedConfigurationNodeIntermediary<?> commented = (CommentedConfigurationNodeIntermediary<?>) destination;
+                final String validComment = Processor.prepareComment(data);
                 if (data.override()) {
-                    commented.comment(data.value());
+                    commented.comment(validComment);
                 } else {
-                    commented.commentIfAbsent(data.value());
+                    commented.commentIfAbsent(validComment);
                 }
             }
         };
+    }
+
+    private static String prepareComment(final Comment data) {
+        return data.afterLineBreak() ? LINE_SEPARATOR + data.value() : data.value();
     }
 
     /**
@@ -125,7 +131,7 @@ public interface Processor<V> {
      */
     static Processor.Factory<Comment, Object> localizedComments(final ResourceBundle source) {
         return (data, fieldType) -> {
-            final String translated = Localization.key(source, data.value());
+            final String translated = Localization.key(source, Processor.prepareComment(data));
             return (value, destination) -> {
                 if (destination instanceof CommentedConfigurationNodeIntermediary<?>) {
                     final CommentedConfigurationNodeIntermediary<?> commented = (CommentedConfigurationNodeIntermediary<?>) destination;
