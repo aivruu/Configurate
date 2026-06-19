@@ -46,7 +46,7 @@ public @interface Comment {
     String value();
 
     /**
-     * Whether or not this comment should be separated from the previous one, an example:
+     * Whether or not this comment should have an line-break after the previous node, an example:
      * <p>
      * <pre>
      * {@code
