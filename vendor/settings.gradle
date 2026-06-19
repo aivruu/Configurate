@@ -2,18 +2,14 @@ import org.gradle.api.initialization.resolve.RepositoriesMode
 
 pluginManagement {
     repositories {
-        maven {
-            name = "stellardriftReleases"
-            url = "https://repo.stellardrift.ca/repository/internal/"
-            mavenContent { releasesOnly() }
-        }
+        mavenCentral()
+        gradlePluginPortal()
     }
 }
 
 plugins {
-    id 'org.gradle.toolchains.foojay-resolver-convention' version '0.4.0'
+    id 'org.gradle.toolchains.foojay-resolver-convention' version '1.0.0'
 }
-
 
 rootProject.name = "configurate-vendor"
 
