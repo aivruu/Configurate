@@ -46,6 +46,37 @@ public @interface Comment {
     String value();
 
     /**
+     * Whether or not this comment should be separated from the previous one, an example:
+     * <p>
+     * <pre>
+     * {@code
+     * @Comment("Whether or not enable the debug-mode.")
+     * private boolean enableDebug;
+     * @Comment(value = "Select the mode on which run the tracker.", afterLineBreak = true)
+     * private TrackerMode mode = TrackerMode.GLOBAL;
+     * @Comment("Specify the update-rate for the tracker in ticks.")
+     * private int updateRate = 20;
+     * }
+     * </pre>
+     * Produce:
+     * <pre>
+     * {@code
+     * # Whether or not enable the debug-mode.
+     * enable-debug: false
+     *
+     * # Select the mode on which run the tracker.
+     * mode: GLOBAL
+     * # Specify the update-rate for the tracker in ticks.
+     * update-rate: 20
+     * }
+     * </pre>
+     *
+     * @return if this comment should be written after an empty-line (line-break).
+     * @since 4.2.0-SNAPSHOT
+     */
+    boolean afterLineBreak() default false;
+
+    /**
      * Whether or not to override existing comments on a node.
      *
      * @return if we should override.
