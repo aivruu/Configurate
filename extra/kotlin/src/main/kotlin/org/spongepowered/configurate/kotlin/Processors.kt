@@ -34,11 +34,12 @@ fun kotlinCommentsProcessor(): Processor.Factory<Comment, Any?> {
     return Processor.Factory { data: Comment, _: Type? ->
         Processor { _: Any?, destination: ConfigurationNode? ->
             if (destination is CommentedConfigurationNodeIntermediary<*>) {
-                val comment = data.value.trimIndent()
+                val value = data.value.trimIndent()
+                val validComment = if (data.afterLineBreak) Processor.LINE_SEPARATOR + value else value;
                 if (data.override) {
-                    destination.comment(comment)
+                    destination.comment(validComment)
                 } else {
-                    destination.commentIfAbsent(comment)
+                    destination.commentIfAbsent(validComment)
                 }
             }
         }
