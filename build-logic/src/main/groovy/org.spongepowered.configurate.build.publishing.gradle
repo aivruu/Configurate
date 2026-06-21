@@ -93,7 +93,7 @@ indra {
     }
     apache2License()
 
-    publishSnapshotsTo("geysermc", "https://repo.opencollab.dev/maven-snapshots")
+//    publishSnapshotsTo("geysermc", "https://repo.opencollab.dev/maven-snapshots")
 
     configurePublications {
         artifactId = archiveName
@@ -133,8 +133,10 @@ signing {
     }
 }
 
-tasks.withType(Sign).configureEach {
-    onlyIf {
-        !project.hasProperty("skipSigning")
+if (System.getenv("JITPACK") != null) {
+    tasks.withType(Sign).configureEach {
+        onlyIf {
+            !project.hasProperty("skipSigning")
+        }
     }
 }
