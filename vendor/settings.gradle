@@ -33,3 +33,5 @@ if (!propsFile.exists()) {
 include "snakeyaml"
 include "typesafe-config"
 findProject(":typesafe-config").projectDir = file("typesafe-config/config")
+project(":snakeyaml").projectDir.mkdirs()
+project(":typesafe-config").projectDir.mkdirs()
