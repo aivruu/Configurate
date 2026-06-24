@@ -47,7 +47,6 @@ public @interface Comment {
 
     /**
      * Whether or not this comment should have an line-break after the previous node, an example:
-     * <p>
      * <pre>
      * {@code
      * @Comment("Whether or not enable the debug-mode.")
