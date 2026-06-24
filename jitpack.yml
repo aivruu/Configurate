@@ -2,5 +2,6 @@ jdk:
   - openjdk17
 before_install:
   - "git submodule update --init --recursive"
+  - "gradle applySnakeyamlPatches applyTypesafeConfigPatches build"
 install:
   - "bash gradlew clean shadowJar publishToMavenLocal"
