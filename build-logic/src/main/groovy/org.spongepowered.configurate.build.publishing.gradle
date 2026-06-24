@@ -94,6 +94,9 @@ indra {
     apache2License()
 
 //    publishSnapshotsTo("geysermc", "https://repo.opencollab.dev/maven-snapshots")
+    if (System.getenv("JITPACK") != null) {
+        publishReleasesTo("jitpack", "https://jitpack.io")
+    }
 
     configurePublications {
         artifactId = archiveName
